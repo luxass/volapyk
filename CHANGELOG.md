@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.3.0
+
+[compare changes](https://github.com/luxass/volapyk/compare/v1.2.0...v1.3.0)
+
+### 🚀 Enhancements
+
+- Export CJK_CODE_RANGES ([476cff2](https://github.com/luxass/volapyk/commit/476cff2))
+
+### ❤️ Contributors
+
+- Lucas Nørgård ([@luxass](http://github.com/luxass))
+
 ## v1.2.0
 
 [compare changes](https://github.com/luxass/volapyk/compare/v1.1.0...v1.2.0)
