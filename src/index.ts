@@ -42,7 +42,7 @@ const DEFAULT_OPTIONS = {
 export const ANSI_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789àâéèêôùûçÀÂÉÈÔÙÛÇ";
 
 // There is probably more CJK code ranges..
-const CJK_CODE_RANGES = [
+export const CJK_CODE_RANGES = [
   [0x3040, 0x309F],
   // CJK Unified ideographs
   [0x4E00, 0x9FFF],
