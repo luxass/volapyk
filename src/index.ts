@@ -30,14 +30,13 @@ export interface Options {
    *
    * @default false
    */
-  isCJK?: boolean
+  oneCharPerWord?: boolean
 }
 
 const DEFAULT_OPTIONS = {
   chars: "preset:ansi",
   type: "text",
   words: 100,
-  isCJK: false,
 } satisfies Options;
 
 export const ANSI_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789àâéèêôùûçÀÂÉÈÔÙÛÇ";
@@ -75,7 +74,7 @@ function inferCJK(charset: string & {}): boolean | undefined {
  * @param {Options} [options=DEFAULT_OPTIONS] options - Options for the volapyk creation
  * @returns {string | string[]} A string or an array of strings, depending on the `type`.
  */
-export function createVolapyk<TOptions extends Options = typeof DEFAULT_OPTIONS>(options?: TOptions): TOptions["type"] extends "chunks" ? string[] : TOptions["type"] extends "text" ? string : (string | string[]) {
+export function createVolapyk<TOptions extends Options>(options?: TOptions): TOptions["type"] extends "chunks" ? string[] : TOptions["type"] extends "text" ? string : (string | string[]) {
   options = options ?? DEFAULT_OPTIONS as TOptions;
   if (options.type !== "chunks" && options.type !== "text") {
     options.type = "text";
@@ -89,18 +88,18 @@ export function createVolapyk<TOptions extends Options = typeof DEFAULT_OPTIONS>
 
   const length = options.words || 100;
 
-  if (options.isCJK === undefined) {
-    options.isCJK = inferCJK(charset);
+  if (options.oneCharPerWord === undefined) {
+    options.oneCharPerWord = inferCJK(charset);
   }
 
-  const isCJK = options.isCJK || false;
+  const oneCharPerWord = options.oneCharPerWord || false;
 
   if (options.type === "chunks") {
     const chunks: string[] = [];
 
     let chunk = "";
 
-    if (isCJK) {
+    if (oneCharPerWord) {
       const charsLength = charset.length;
       for (let i = 0; i < length; i++) {
         chunk += charset[Math.floor(Math.random() * charsLength)];
@@ -130,7 +129,7 @@ export function createVolapyk<TOptions extends Options = typeof DEFAULT_OPTIONS>
   }
   let text = "";
 
-  if (isCJK) {
+  if (oneCharPerWord) {
     const charsLength = charset.length;
     for (let i = 0; i < length; i++) {
       text += charset[Math.floor(Math.random() * charsLength)];
@@ -154,7 +153,7 @@ export function createVolapyk<TOptions extends Options = typeof DEFAULT_OPTIONS>
  * @param {Options} [options=DEFAULT_OPTIONS] options - Options for the volapyk creation
  * @returns {string[]} A string of volapyk chunks.
  */
-export function createVolapykChunks(options: Pick<Options, "words" | "chars">): string[] {
+export function createVolapykChunks(options: Pick<Options, "words" | "chars" | "oneCharPerWord">): string[] {
   return createVolapyk({ ...options, type: "chunks" });
 }
 
@@ -163,6 +162,6 @@ export function createVolapykChunks(options: Pick<Options, "words" | "chars">): 
  * @param {Options} [options=DEFAULT_OPTIONS] options - Options for the volapyk creation
  * @returns {string} A string of volapyk text.
  */
-export function createVolapykText(options: Pick<Options, "words" | "chars">): string {
+export function createVolapykText(options: Pick<Options, "words" | "chars" | "oneCharPerWord">): string {
   return createVolapyk({ ...options, type: "text" });
 }
