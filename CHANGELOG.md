@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.3.1
+
+[compare changes](https://github.com/luxass/volapyk/compare/v1.3.0...v1.3.1)
+
+### 🏡 Chore
+
+- Add jsdoc to inferCJK ([8272f34](https://github.com/luxass/volapyk/commit/8272f34))
+
+### 🤖 CI
+
+- Change to release workflow ([387907d](https://github.com/luxass/volapyk/commit/387907d))
+
+### ❤️ Contributors
+
+- Lucas Nørgård ([@luxass](http://github.com/luxass))
+
 ## v1.3.0
 
 [compare changes](https://github.com/luxass/volapyk/compare/v1.2.0...v1.3.0)
