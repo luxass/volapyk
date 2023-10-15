@@ -29,7 +29,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Output git status
-        run: git status --short
+        run: |
+          echo "Git status: $(git status --short)"
 
       - name: Publish to NPM
         run: pnpm publish --access public
