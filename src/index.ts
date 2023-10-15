@@ -52,7 +52,7 @@ const CJK_CODE_RANGES = [
   [0x20000, 0x2EBE0],
 ];
 
-function inferCJK(charset: string & {}): boolean | undefined {
+export function inferCJK(charset: string & {}): boolean | undefined {
   if (!charset) return false;
 
   for (const char of charset) {
