@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.3.2
+
+[compare changes](https://github.com/luxass/volapyk/compare/v1.3.1...v1.3.2)
+
+### 🤖 CI
+
+- Changes to release workflow ([f5355db](https://github.com/luxass/volapyk/commit/f5355db))
+
+### ❤️ Contributors
+
+- Lucas Nørgård ([@luxass](http://github.com/luxass))
+
 ## v1.3.1
 
 [compare changes](https://github.com/luxass/volapyk/compare/v1.3.0...v1.3.1)
