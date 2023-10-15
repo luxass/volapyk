@@ -28,6 +28,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Output git status
+        run: git status --short
+
       - name: Publish to NPM
         run: pnpm publish --access public
         env:
