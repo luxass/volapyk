@@ -1,5 +1,8 @@
 {
   "$schema": "https://projectrc.luxass.dev/schema",
   "npm": true,
-  "readme": true
+  "readme": true,
+  "handles": [
+    "/volapyk"
+  ]
 }
