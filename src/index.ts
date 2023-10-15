@@ -52,10 +52,15 @@ export const CJK_CODE_RANGES = [
   [0x20000, 0x2EBE0],
 ];
 
-export function inferCJK(charset: string & {}): boolean | undefined {
-  if (!charset) return false;
+/**
+ * Infer if the characters are CJK characters.
+ * @param {string} characters - The characters to use
+ * @returns {boolean | undefined} `true` if the characters are CJK characters, `false` if they are not.
+ */
+export function inferCJK(characters: string): boolean | undefined {
+  if (!characters) return false;
 
-  for (const char of charset) {
+  for (const char of characters) {
     const code = char.charCodeAt(0);
 
     for (const [start, end] of CJK_CODE_RANGES) {
