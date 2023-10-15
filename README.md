@@ -2,11 +2,6 @@
 
 `/vɔlɑˈpyg/`, "volapyk", or "volapük"
 
-## ✨ Features
-
-- ESM Support
-- Streaming support
-
 ## 📦 Installation
 
 ```sh
@@ -16,7 +11,7 @@ pnpm install volapyk
 ## 📚 Usage
 
 ```ts
-import { } from "volapyk";
+import { createVolapyk } from "volapyk";
 ```
 
 ## 💻 Development

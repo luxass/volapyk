@@ -3,8 +3,6 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   entry: [
     "./src/index.ts",
-    "./src/stream.ts",
-    "./src/locales/*.ts",
   ],
   format: ["cjs", "esm"],
   clean: true,
