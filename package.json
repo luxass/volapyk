@@ -45,7 +45,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
-    "release": "npx bumpp"
+    "release": "changelogen --release --no-tag --no-commit && eslint . --fix"
   },
   "devDependencies": {
     "@luxass/eslint-config": "^3.3.2",

@@ -26,7 +26,7 @@ jobs:
           run_install: true
 
       - name: Create release
-        run: npx changelogithub
+        run: npx changelogen gh release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
