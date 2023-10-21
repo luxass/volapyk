@@ -44,7 +44,8 @@
     "test": "vitest run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "release": "npx bumpp"
   },
   "devDependencies": {
     "@luxass/eslint-config": "^3.3.2",
