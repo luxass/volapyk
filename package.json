@@ -43,14 +43,11 @@
     "dev": "vitest",
     "test": "vitest run",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit",
-    "release": "changelogen --release --no-tag --no-commit && eslint . --fix"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@luxass/eslint-config": "^3.3.2",
     "@types/node": "^18.16.19",
-    "changelogen": "^0.5.5",
     "eslint": "^8.51.0",
     "tsup": "^7.2.0",
     "typescript": "^5.2.2",
