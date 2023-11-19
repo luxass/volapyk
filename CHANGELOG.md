@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.3.7
+
+[compare changes](https://github.com/luxass/volapyk/compare/v1.3.5...v1.3.7)
+
+### 🩹 Fixes
+
+- Remove release script ([102d9a9](https://github.com/luxass/volapyk/commit/102d9a9))
+
+### 🏡 Chore
+
+- Release v1.3.6 ([223706a](https://github.com/luxass/volapyk/commit/223706a))
+- Lint ([11b8d4e](https://github.com/luxass/volapyk/commit/11b8d4e))
+
+### 🤖 CI
+
+- Remove duplicate step ([022e1b0](https://github.com/luxass/volapyk/commit/022e1b0))
+- Setup git hooks ([225c634](https://github.com/luxass/volapyk/commit/225c634))
+
+### ❤️ Contributors
+
+- Lucas Nørgård ([@luxass](http://github.com/luxass))
+
 ## v1.3.5
 
 [compare changes](https://github.com/luxass/volapyk/compare/v1.3.4...v1.3.5)
