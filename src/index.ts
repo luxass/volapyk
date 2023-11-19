@@ -1,5 +1,6 @@
 // the (string & {}) is just here, to make sure that everything passes.
 // if the output type is not a "chunks" or "text", it will be defaulted to "text"
+// eslint-disable-next-line ts/ban-types
 export type OutputType = "chunks" | "text" | (string & {});
 
 export type Preset = "ansi";
@@ -10,6 +11,7 @@ export interface Options {
    *
    * @default "preset:ansi"
    */
+  // eslint-disable-next-line ts/ban-types
   chars?: `preset:${Preset}` | (string & {})
 
   /**
@@ -76,7 +78,7 @@ export function inferCJK(characters: string): boolean | undefined {
 
 /**
  * Create volapyk text.
- * @param {Options} [options=DEFAULT_OPTIONS] options - Options for the volapyk creation
+ * @param {Options} [options] options - Options for the volapyk creation
  * @returns {string | string[]} A string or an array of strings, depending on the `type`.
  */
 export function createVolapyk<TOptions extends Options>(options?: TOptions): TOptions["type"] extends "chunks" ? string[] : TOptions["type"] extends "text" ? string : (string | string[]) {
@@ -155,7 +157,7 @@ export function createVolapyk<TOptions extends Options>(options?: TOptions): TOp
 
 /**
  * Create volapyk chunks.
- * @param {Options} [options=DEFAULT_OPTIONS] options - Options for the volapyk creation
+ * @param {Options} [options] options - Options for the volapyk creation
  * @returns {string[]} A string of volapyk chunks.
  */
 export function createVolapykChunks(options: Pick<Options, "words" | "chars" | "oneCharPerWord">): string[] {
@@ -164,7 +166,7 @@ export function createVolapykChunks(options: Pick<Options, "words" | "chars" | "
 
 /**
  * Create volapyk text.
- * @param {Options} [options=DEFAULT_OPTIONS] options - Options for the volapyk creation
+ * @param {Options} [options] options - Options for the volapyk creation
  * @returns {string} A string of volapyk text.
  */
 export function createVolapykText(options: Pick<Options, "words" | "chars" | "oneCharPerWord">): string {
