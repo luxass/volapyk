@@ -28,9 +28,6 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Create release
-        run: npx changelogen gh release
-
       - name: Release
         run: npx changelogen@latest gh release --publish
         env:
