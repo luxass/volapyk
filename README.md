@@ -13,21 +13,20 @@ pnpm install volapyk
 ```ts
 import { createVolapyk, createVolapykChunks, createVolapykText } from "volapyk";
 
+// will create a text string of 10 words
 const volapyk = createVolapyk({
   type: "text",
   words: 10
 });
 
-// will create a text string of 10 words
 
-// use a different charset
+// will create a text string of 10 words using only the characters "abcdefghijkl"
 const volapyk = createVolapyk({
   type: "text",
   words: 10,
   chars: "abcdefghijkl"
 });
 
-// will create a text string of 10 words using only the characters "abcdefghijkl"
 
 // create chunks instead of a string, or you can use the createVolapykChunks function
 const volapyk = createVolapyk({
