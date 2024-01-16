@@ -5,7 +5,7 @@
 ## 📦 Installation
 
 ```sh
-pnpm install volapyk
+npm install volapyk
 ```
 
 ## 📚 Usage
