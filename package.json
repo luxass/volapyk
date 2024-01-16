@@ -1,7 +1,7 @@
 {
   "name": "volapyk",
   "version": "1.4.0",
-  "description": "Generate a volapyk text",
+  "description": "Generate random and meaningless blocks or sequences",
   "type": "module",
   "author": {
     "name": "Lucas Nørgård",

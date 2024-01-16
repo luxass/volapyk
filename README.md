@@ -19,14 +19,12 @@ const volapyk = createVolapyk({
   words: 10
 });
 
-
 // will create a text string of 10 words using only the characters "abcdefghijkl"
 const volapyk = createVolapyk({
   type: "text",
   words: 10,
   chars: "abcdefghijkl"
 });
-
 
 // create chunks instead of a string, or you can use the createVolapykChunks function
 const volapyk = createVolapyk({
