@@ -51,7 +51,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "^4.0.0-beta.4",
+    "@luxass/eslint-config": "^4.7.0",
     "@types/node": "^18.16.19",
     "eslint": "^8.54.0",
     "eslint-plugin-format": "^0.1.0",
