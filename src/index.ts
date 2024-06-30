@@ -1,6 +1,6 @@
 // the (string & {}) is just here, to make sure that everything passes.
 // if the output type is not a "chunks" or "text", it will be defaulted to "text"
-// eslint-disable-next-line ts/ban-types
+
 export type OutputType = "chunks" | "text" | (string & {});
 
 export type Preset = "ansi";
@@ -11,20 +11,20 @@ export interface Options {
    *
    * @default "preset:ansi"
    */
-  // eslint-disable-next-line ts/ban-types
-  chars?: `preset:${Preset}` | (string & {})
+
+  chars?: `preset:${Preset}` | (string & {});
 
   /**
    * The type of the output.
    *
    * @default "text"
    */
-  type?: OutputType
+  type?: OutputType;
 
   /**
    * The amount of words to generate.
    */
-  words?: number
+  words?: number;
 
   /**
    * If you are using CJK characters, you should set this to `true`.
@@ -32,7 +32,7 @@ export interface Options {
    *
    * @default false
    */
-  oneCharPerWord?: boolean
+  oneCharPerWord?: boolean;
 }
 
 const DEFAULT_OPTIONS = {
