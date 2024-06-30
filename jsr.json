@@ -8,7 +8,7 @@
     "tsup.config.ts",
     "eslint.config.js",
     "pnpm-lock.yaml",
-    "tests",
+    "test",
     ".github/**",
     ".nvmrc",
     "tsconfig.json",
