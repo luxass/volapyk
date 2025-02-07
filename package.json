@@ -1,6 +1,6 @@
 {
   "name": "volapyk",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "Generate random and meaningless blocks or sequences",
   "type": "module",
   "author": {
