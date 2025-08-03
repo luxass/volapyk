@@ -5,13 +5,11 @@
     ".": "./src/index.ts"
   },
   "exclude": [
-    "tsup.config.ts",
+    "tsdown.config.ts",
     "eslint.config.js",
     "pnpm-lock.yaml",
     "test",
     ".github/**",
-    ".nvmrc",
-    "tsconfig.json",
-    "playground.ts"
+    "tsconfig.json"
   ]
 }
