@@ -72,11 +72,13 @@ describe("createVolapyk fallback behavior", () => {
     expect(result.split(" ")).toHaveLength(3);
   });
 
-  it("preserves the existing chunk boundaries", () => {
+  it("splits chunks after every 10th word", () => {
+    // 0.5 gives words of floor(0.5 * 10) + 1 = 6 characters.
     const random = vi.spyOn(Math, "random").mockReturnValue(0.5);
     try {
       const result = createVolapykChunks({ chars: "a", words: 12, oneCharPerWord: false });
-      expect(result).toEqual([Array.from({ length: 11 }, () => "aaaaa").join(" "), "aaaaa"]);
+      const word = "aaaaaa";
+      expect(result).toEqual([Array.from({ length: 10 }, () => word).join(" "), `${word} ${word}`]);
     } finally {
       random.mockRestore();
     }
