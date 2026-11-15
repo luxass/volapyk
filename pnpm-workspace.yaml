@@ -1,0 +1,24 @@
+ignoreScripts: true
+minimumReleaseAge: 7200
+trustPolicy: no-downgrade
+catalogMode: prefer
+strictDepBuilds: true
+blockExoticSubdeps: true
+
+overrides:
+  undici-types: 8.12.4
+
+catalogs:
+  dev:
+    oxfmt: 0.78.0
+    oxlint: 1.93.0
+    oxlint-tsgolint: 7.0.2006
+    publint: 0.3.25
+    tsdown: 0.23.7
+    typescript: 7.0.2
+
+  testing:
+    vitest: 5.1.0
+
+  types:
+    '@types/node': 26.6.6
