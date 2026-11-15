@@ -2,38 +2,34 @@
   "name": "volapyk",
   "version": "2.1.0",
   "description": "Generate random and meaningless blocks or sequences",
-  "type": "module",
+  "keywords": [
+    "random texts",
+    "random words",
+    "volapyk",
+    "volapyk-generator"
+  ],
+  "homepage": "https://github.com/luxass/volapyk",
+  "bugs": {
+    "url": "https://github.com/luxass/volapyk/issues"
+  },
+  "license": "MIT",
   "author": {
     "name": "Lucas Nørgård",
     "email": "lucasnrgaard@gmail.com",
     "url": "https://luxass.dev"
   },
-  "packageManager": "pnpm@12.19.0",
-  "license": "MIT",
-  "homepage": "https://github.com/luxass/volapyk",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/luxass/volapyk.git"
   },
-  "bugs": {
-    "url": "https://github.com/luxass/volapyk/issues"
-  },
-  "keywords": [
-    "volapyk",
-    "volapyk-generator",
-    "random words",
-    "random texts"
-  ],
-  "exports": {
-    ".": "./dist/index.mjs",
-    "./package.json": "./package.json"
-  },
-  "types": "./dist/index.d.mts",
   "files": [
     "dist"
   ],
-  "engines": {
-    "node": ">=24"
+  "type": "module",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsdown",
@@ -54,5 +50,9 @@
     "tsdown": "catalog:dev",
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"
-  }
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.19.0"
 }
