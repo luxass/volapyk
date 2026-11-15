@@ -1,5 +1,12 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
-import { ANSI_CHARACTERS, createVolapyk, createVolapykChunks, createVolapykText } from "../src";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
+
+import {
+  ANSI_CHARACTERS,
+  createVolapyk,
+  createVolapykChunks,
+  createVolapykText,
+  inferCJK,
+} from "../src";
 
 export const CJK_CHARACTERS = "안녕하세요こんにちは你好你好吗";
 
@@ -12,13 +19,13 @@ describe("createVolapyk", () => {
     expect(result).toBeTypeOf("string");
   });
 
-  it("should return an array of strings if type is \"chunks\"", () => {
+  it('should return an array of strings if type is "chunks"', () => {
     const result = createVolapyk({ type: "chunks" });
     expect(Array.isArray(result)).toBe(true);
     expect(result.every((chunk) => typeof chunk === "string")).toBe(true);
   });
 
-  it("should return a string with words separated by spaces if type is \"text\"", () => {
+  it('should return a string with words separated by spaces if type is "text"', () => {
     const result = createVolapyk({ type: "text" });
     expect(result).toBeTypeOf("string");
     expect(result.split(" ")).toHaveLength(100);
@@ -27,12 +34,18 @@ describe("createVolapyk", () => {
   it("should use the provided charset if specified", () => {
     const charset = "abc";
     const result = createVolapyk({ chars: charset, type: "text" });
-    expect(result.split(" ").every((word) => word.split("").every((char) => charset.includes(char)))).toBe(true);
+    expect(
+      result.split(" ").every((word) => word.split("").every((char) => charset.includes(char))),
+    ).toBe(true);
   });
 
-  it("should use ANSI characters if \"preset:ansi\" is specified as charset", () => {
+  it('should use ANSI characters if "preset:ansi" is specified as charset', () => {
     const result = createVolapyk({ chars: "preset:ansi", type: "text" });
-    expect(result.split(" ").every((word) => word.split("").every((char) => ANSI_CHARACTERS.includes(char)))).toBe(true);
+    expect(
+      result
+        .split(" ")
+        .every((word) => word.split("").every((char) => ANSI_CHARACTERS.includes(char))),
+    ).toBe(true);
   });
 
   it("should use the provided number of words if specified", () => {
@@ -40,32 +53,72 @@ describe("createVolapyk", () => {
     const result = createVolapyk({ words, type: "text" });
     expect(result.split(" ")).toHaveLength(words);
   });
+});
 
-  describe("expect different return types, based on the type option", () => {
-    it("should return a string if type is \"text\"", () => {
-      const result = createVolapyk({ type: "text" });
-      expect(result).toBeTypeOf("string");
-      expectTypeOf(result).toEqualTypeOf<string>();
-    });
-
-    it("should return an array of strings if type is \"chunks\"", () => {
-      const result = createVolapyk({ type: "chunks" });
-      expect(Array.isArray(result)).toBe(true);
-      expect(result.every((chunk) => typeof chunk === "string")).toBe(true);
-      expectTypeOf(result).toEqualTypeOf<string[]>();
-    });
-
-    it("should return string | string[] if type is neither \"text\" nor \"chunks\"", () => {
-      // type can't be inferred
-      const type: string = "text";
-
-      const result = createVolapyk({
-        type,
-      });
-      expectTypeOf(result).toEqualTypeOf<string | string[]>();
-    });
+describe("createVolapyk fallback behavior", () => {
+  it.each([undefined, 0, Number.NaN])("keeps the default count for %s words", (words) => {
+    const result = createVolapykText({ chars: "a", words, oneCharPerWord: true });
+    expect(result).toBe("a".repeat(100));
   });
 
+  it("falls back to text for unknown output modes", () => {
+    expect(createVolapyk({ type: "unknown", chars: "a", words: 3, oneCharPerWord: true })).toBe(
+      "aaa",
+    );
+  });
+
+  it("preserves an explicit false for CJK character handling", () => {
+    const result = createVolapykText({ chars: CJK_CHARACTERS, words: 3, oneCharPerWord: false });
+    expect(result.split(" ")).toHaveLength(3);
+  });
+
+  it("preserves the existing chunk boundaries", () => {
+    const random = vi.spyOn(Math, "random").mockReturnValue(0.5);
+    try {
+      const result = createVolapykChunks({ chars: "a", words: 12, oneCharPerWord: false });
+      expect(result).toEqual([Array.from({ length: 11 }, () => "aaaaa").join(" "), "aaaaa"]);
+    } finally {
+      random.mockRestore();
+    }
+  });
+});
+
+describe("inferCJK", () => {
+  it.each(["", "abc"])("does not classify %s as CJK", (characters) => {
+    expect(inferCJK(characters)).toBe(false);
+  });
+
+  it.each(["漢", "안", "あ", "\u{20000}"])("recognizes the code point in %s", (characters) => {
+    expect(inferCJK(characters)).toBe(true);
+  });
+});
+
+describe("createVolapyk return types", () => {
+  it('should return a string if type is "text"', () => {
+    const result = createVolapyk({ type: "text" });
+    expect(result).toBeTypeOf("string");
+    expectTypeOf(result).toEqualTypeOf<string>();
+  });
+
+  it('should return an array of strings if type is "chunks"', () => {
+    const result = createVolapyk({ type: "chunks" });
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.every((chunk) => typeof chunk === "string")).toBe(true);
+    expectTypeOf(result).toEqualTypeOf<string[]>();
+  });
+
+  it('should return string | string[] if type is neither "text" nor "chunks"', () => {
+    // type can't be inferred
+    const type: string = "text";
+
+    const result = createVolapyk({
+      type,
+    });
+    expectTypeOf(result).toEqualTypeOf<string | string[]>();
+  });
+});
+
+describe("createVolapyk character handling", () => {
   it("should infer `oneCharPerWord` value if not specified", () => {
     const length = 10;
     const result = createVolapyk({
@@ -110,12 +163,22 @@ describe("createVolapykChunks", () => {
   it("should use the provided charset if specified", () => {
     const charset = "abc";
     const result = createVolapykChunks({ words: 100, chars: charset });
-    expect(result.every((chunk) => chunk.split(" ").every((word) => word.split("").every((char) => charset.includes(char))))).toBe(true);
+    expect(
+      result.every((chunk) =>
+        chunk.split(" ").every((word) => word.split("").every((char) => charset.includes(char))),
+      ),
+    ).toBe(true);
   });
 
-  it("should use ANSI characters if \"preset:ansi\" is specified as charset", () => {
+  it('should use ANSI characters if "preset:ansi" is specified as charset', () => {
     const result = createVolapykChunks({ words: 100, chars: "preset:ansi" });
-    expect(result.every((chunk) => chunk.split(" ").every((word) => word.split("").every((char) => ANSI_CHARACTERS.includes(char))))).toBe(true);
+    expect(
+      result.every((chunk) =>
+        chunk
+          .split(" ")
+          .every((word) => word.split("").every((char) => ANSI_CHARACTERS.includes(char))),
+      ),
+    ).toBe(true);
   });
 
   it("should use the provided number of words if specified", () => {
@@ -123,7 +186,9 @@ describe("createVolapykChunks", () => {
     const result = createVolapykChunks({ words, chars: "abc" });
     expect(result.reduce((acc, chunk) => acc + chunk.split(" ").length, 0)).toBe(words);
   });
+});
 
+describe("createVolapykChunks character handling", () => {
   it("should infer `oneCharPerWord` value if not specified", () => {
     const length = 10;
     const result = createVolapykChunks({
@@ -169,16 +234,24 @@ describe("createVolapykText", () => {
     const result = createVolapykText({ chars: charset });
 
     expect(result).toBeTypeOf("string");
-    expect(result.split(" ").every((word) => word.split("").every((char) => charset.includes(char)))).toBe(true);
+    expect(
+      result.split(" ").every((word) => word.split("").every((char) => charset.includes(char))),
+    ).toBe(true);
   });
 
-  it("should use ANSI characters if \"preset:ansi\" is specified as charset", () => {
+  it('should use ANSI characters if "preset:ansi" is specified as charset', () => {
     const result = createVolapykText({ chars: "preset:ansi" });
 
     expect(result).toBeTypeOf("string");
-    expect(result.split(" ").every((word) => word.split("").every((char) => ANSI_CHARACTERS.includes(char)))).toBe(true);
+    expect(
+      result
+        .split(" ")
+        .every((word) => word.split("").every((char) => ANSI_CHARACTERS.includes(char))),
+    ).toBe(true);
   });
+});
 
+describe("createVolapykText character handling", () => {
   it("should infer `oneCharPerWord` value if not specified", () => {
     const length = 10;
     const result = createVolapykText({
