@@ -46,14 +46,28 @@ export const ANSI_CHARACTERS =
 
 /** Lists the inclusive Unicode code point ranges used to detect CJK characters. */
 export const CJK_CODE_RANGES: ReadonlyArray<readonly [start: number, end: number]> = [
-  // Hiragana
-  [0x3040, 0x309f],
-  // CJK Unified ideographs
+  // CJK Symbols and Punctuation
+  [0x3000, 0x303f],
+  // Hiragana and Katakana
+  [0x3040, 0x30ff],
+  // Katakana Phonetic Extensions
+  [0x31f0, 0x31ff],
+  // CJK Unified Ideographs Extension A
+  [0x3400, 0x4dbf],
+  // CJK Unified Ideographs
   [0x4e00, 0x9fff],
-  // Hangul
+  // Hangul Syllables
   [0xac00, 0xd7a3],
-  // CJK extensions
-  [0x20000, 0x2ebe0],
+  // CJK Compatibility Ideographs
+  [0xf900, 0xfaff],
+  // Halfwidth Katakana
+  [0xff65, 0xff9f],
+  // CJK Unified Ideographs Extensions B to F, and I
+  [0x20000, 0x2ee5f],
+  // CJK Compatibility Ideographs Supplement
+  [0x2f800, 0x2fa1f],
+  // CJK Unified Ideographs Extensions G and H
+  [0x30000, 0x323af],
 ];
 
 /** The number of words in each chunk when `type` is `"chunks"`. */
@@ -139,11 +153,14 @@ function generateWords(chars: readonly string[], count: number): string[] {
   return Array.from({ length: Math.max(0, count) }, () => generateWord(chars));
 }
 
-/** Groups words into chunks of WORDS_PER_CHUNK, leaving any remainder in the last chunk. */
-function groupIntoChunks(words: readonly string[]): string[] {
+/**
+ * Groups words into chunks of WORDS_PER_CHUNK, leaving any remainder in the last chunk.
+ * @param separator - Joins the words in a chunk: a space, or `""` when `oneCharPerWord` is on.
+ */
+function groupIntoChunks(words: readonly string[], separator: string): string[] {
   const chunks: string[] = [];
   for (let i = 0; i < words.length; i += WORDS_PER_CHUNK) {
-    chunks.push(words.slice(i, i + WORDS_PER_CHUNK).join(" "));
+    chunks.push(words.slice(i, i + WORDS_PER_CHUNK).join(separator));
   }
   return chunks;
 }
@@ -164,16 +181,15 @@ export function createVolapyk<TOptions extends Options>(
 export function createVolapyk(options: Options = {}): string | string[] {
   const { type, chars, words, oneCharPerWord } = resolveOptions(options);
 
-  if (oneCharPerWord) {
-    let text = "";
-    for (let i = 0; i < words; i++) {
-      text += pickChar(chars);
-    }
-    return type === "chunks" ? [text] : text;
-  }
+  // With oneCharPerWord, each word is a single character and words are not separated.
+  const generatedWords = oneCharPerWord
+    ? Array.from({ length: Math.max(0, words) }, () => pickChar(chars))
+    : generateWords(chars, words);
+  const separator = oneCharPerWord ? "" : " ";
 
-  const generatedWords = generateWords(chars, words);
-  return type === "chunks" ? groupIntoChunks(generatedWords) : generatedWords.join(" ");
+  return type === "chunks"
+    ? groupIntoChunks(generatedWords, separator)
+    : generatedWords.join(separator);
 }
 
 /**
