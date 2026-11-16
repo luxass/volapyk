@@ -9,6 +9,9 @@ export interface Options {
   /**
    * The characters to use for the volapyk.
    *
+   * Characters are split into user-perceived characters (grapheme clusters),
+   * so emoji, flags, and combined accents are never broken apart.
+   *
    * @default "preset:ansi"
    */
 
@@ -23,6 +26,8 @@ export interface Options {
 
   /**
    * The amount of words to generate.
+   *
+   * @default 100
    */
   words?: number;
 
@@ -35,18 +40,13 @@ export interface Options {
   oneCharPerWord?: boolean;
 }
 
-const DEFAULT_OPTIONS = {
-  chars: "preset:ansi",
-  type: "text",
-  words: 100,
-} satisfies Options;
-
 /** Contains the characters used by the default preset. */
 export const ANSI_CHARACTERS =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789àâéèêôùûçÀÂÉÈÔÙÛÇ";
 
-/** Lists the inclusive Unicode ranges used to detect CJK characters. */
-export const CJK_CODE_RANGES = [
+/** Lists the inclusive Unicode code point ranges used to detect CJK characters. */
+export const CJK_CODE_RANGES: ReadonlyArray<readonly [start: number, end: number]> = [
+  // Hiragana
   [0x3040, 0x309f],
   // CJK Unified ideographs
   [0x4e00, 0x9fff],
@@ -56,78 +56,103 @@ export const CJK_CODE_RANGES = [
   [0x20000, 0x2ebe0],
 ];
 
+/** The number of words in each chunk when `type` is `"chunks"`. */
+const WORDS_PER_CHUNK = 10;
+
+/** The longest word generated when `oneCharPerWord` is off. */
+const MAX_WORD_LENGTH = 10;
+
+const DEFAULT_WORD_COUNT = 100;
+
+const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+
 /**
  * Infer if the characters are CJK characters.
  * @param {string} characters - The characters to use
- * @returns {boolean | undefined} `true` if the characters are CJK characters, `false` if they are not.
+ * @returns {boolean} `true` if any character is a CJK character, `false` if none are.
  */
-export function inferCJK(characters: string): boolean | undefined {
-  if (characters === "") return false;
-
+export function inferCJK(characters: string): boolean {
+  // Iterating a string yields full code points, so supplementary-plane
+  // characters such as U+20000 are compared as a single value.
   for (const char of characters) {
     const code = char.codePointAt(0);
     if (code === undefined) continue;
 
-    for (const [start, end] of CJK_CODE_RANGES) {
-      if (start === undefined || end === undefined) return false;
-      if (code >= start && code <= end) {
-        return true;
-      }
+    if (CJK_CODE_RANGES.some(([start, end]) => code >= start && code <= end)) {
+      return true;
     }
   }
 
   return false;
 }
 
-/** Generates a continuous sequence using one character per word. */
-function generateCharacterSequence(charset: string, length: number): string {
-  let text = "";
-  for (let i = 0; i < length; i++) {
-    text += charset[Math.floor(Math.random() * charset.length)];
-  }
-  return text;
+/** Options after defaults are applied. Never shares state with the caller. */
+interface ResolvedOptions {
+  type: "chunks" | "text";
+  /** The charset split into grapheme clusters, so each entry is one whole character. */
+  chars: readonly string[];
+  words: number;
+  oneCharPerWord: boolean;
 }
 
-/** Generates space-separated words in the existing chunk boundaries. */
-function generateVolapykChunks(charset: string, length: number): string[] {
+/** Applies defaults without mutating the caller's options. */
+function resolveOptions(options: Options): ResolvedOptions {
+  const charset =
+    options.chars === undefined || options.chars === "" || options.chars === "preset:ansi"
+      ? ANSI_CHARACTERS
+      : options.chars;
+
+  // Zero and NaN fall back to the default, like an omitted count.
+  const words =
+    options.words === undefined || options.words === 0 || Number.isNaN(options.words)
+      ? DEFAULT_WORD_COUNT
+      : options.words;
+
+  return {
+    type: options.type === "chunks" ? "chunks" : "text",
+    chars: Array.from(graphemeSegmenter.segment(charset), ({ segment }) => segment),
+    words,
+    oneCharPerWord: options.oneCharPerWord ?? inferCJK(charset),
+  };
+}
+
+/** Picks one whole character from the charset. */
+function pickChar(chars: readonly string[]): string {
+  // `chars` is never empty: an empty charset falls back to ANSI_CHARACTERS.
+  return chars[Math.floor(Math.random() * chars.length)]!;
+}
+
+/** Generates one word of 1 to MAX_WORD_LENGTH characters. */
+function generateWord(chars: readonly string[]): string {
+  // `Math.random()` can return 0, so floor + 1 keeps every word non-empty.
+  const wordLength = Math.floor(Math.random() * MAX_WORD_LENGTH) + 1;
+
+  let word = "";
+  for (let i = 0; i < wordLength; i++) {
+    word += pickChar(chars);
+  }
+  return word;
+}
+
+/** Generates the requested number of words. */
+function generateWords(chars: readonly string[], count: number): string[] {
+  return Array.from({ length: Math.max(0, count) }, () => generateWord(chars));
+}
+
+/** Groups words into chunks of WORDS_PER_CHUNK, leaving any remainder in the last chunk. */
+function groupIntoChunks(words: readonly string[]): string[] {
   const chunks: string[] = [];
-  let chunk = "";
-
-  for (let i = 0; i < length; i++) {
-    const wordLength = Math.ceil(Math.random() * 10);
-    for (let j = 0; j < wordLength; j++) {
-      chunk += charset[Math.floor(Math.random() * charset.length)];
-    }
-    chunk += " ";
-
-    if (i !== 0 && i % 10 === 0) {
-      if (chunk.endsWith(" ")) chunk = chunk.slice(0, -1);
-      chunks.push(chunk);
-      chunk = "";
-    }
+  for (let i = 0; i < words.length; i += WORDS_PER_CHUNK) {
+    chunks.push(words.slice(i, i + WORDS_PER_CHUNK).join(" "));
   }
-  if (chunk.endsWith(" ")) chunk = chunk.slice(0, -1);
-  chunks.push(chunk);
-
   return chunks;
-}
-
-/** Generates random words separated by a single space. */
-function generateVolapykText(charset: string, length: number): string {
-  let text = "";
-  for (let i = 0; i < length; i++) {
-    const wordLength = Math.ceil(Math.random() * 10);
-    for (let j = 0; j < wordLength; j++) {
-      text += charset[Math.floor(Math.random() * charset.length)];
-    }
-    if (i !== length - 1) text += " ";
-  }
-  return text;
 }
 
 /**
  * Creates volapyk with a return type inferred from the output mode.
  * Unknown output modes fall back to text.
+ *
+ * The passed `options` object is never modified.
  */
 export function createVolapyk<TOptions extends Options>(
   options?: TOptions,
@@ -136,36 +161,25 @@ export function createVolapyk<TOptions extends Options>(
   : TOptions["type"] extends "text"
     ? string
     : string | string[];
-export function createVolapyk(options?: Options): string | string[] {
-  options ??= DEFAULT_OPTIONS;
-  if (options.type !== "chunks" && options.type !== "text") {
-    options.type = "text";
-  }
-
-  let charset = options.chars;
-  if (charset === undefined || charset === "" || charset === "preset:ansi") {
-    charset = ANSI_CHARACTERS;
-  }
-
-  // Preserve the existing fallback for zero and NaN as well as omitted counts.
-  const length = options.words === 0 || Number.isNaN(options.words) ? 100 : (options.words ?? 100);
-  options.oneCharPerWord ??= inferCJK(charset);
-  const oneCharPerWord = options.oneCharPerWord ?? false;
+export function createVolapyk(options: Options = {}): string | string[] {
+  const { type, chars, words, oneCharPerWord } = resolveOptions(options);
 
   if (oneCharPerWord) {
-    const text = generateCharacterSequence(charset, length);
-    return options.type === "chunks" ? [text] : text;
+    let text = "";
+    for (let i = 0; i < words; i++) {
+      text += pickChar(chars);
+    }
+    return type === "chunks" ? [text] : text;
   }
 
-  return options.type === "chunks"
-    ? generateVolapykChunks(charset, length)
-    : generateVolapykText(charset, length);
+  const generatedWords = generateWords(chars, words);
+  return type === "chunks" ? groupIntoChunks(generatedWords) : generatedWords.join(" ");
 }
 
 /**
  * Create volapyk chunks.
  * @param {Options} [options] options - Options for the volapyk creation
- * @returns {string[]} A string of volapyk chunks.
+ * @returns {string[]} An array of chunks with up to 10 words each.
  */
 export function createVolapykChunks(
   options: Pick<Options, "words" | "chars" | "oneCharPerWord">,
